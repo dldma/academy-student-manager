@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 function DashboardPage() {
@@ -29,7 +30,10 @@ function DashboardPage() {
       {profile?.role === 'admin' && (
         <div>
           <h3>원장 관리</h3>
-          <p>원장 전용 기능을 사용할 수 있습니다.</p>
+
+          <Link to="/admin">
+            원장 관리 화면으로 이동
+          </Link>
         </div>
       )}
     </div>

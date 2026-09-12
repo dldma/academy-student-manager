@@ -6,10 +6,16 @@ import {
 } from 'react-router-dom'
 
 import { AuthProvider } from './contexts/AuthContext'
+
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
+import AdminPage from './pages/AdminPage'
+import AdminStudentsPage from './pages/AdminStudentsPage'
+import AdminStudentNewPage from './pages/AdminStudentNewPage'
+import AdminStudentDetailPage from './pages/AdminStudentDetailPage'
 
 function App() {
   return (
@@ -18,7 +24,12 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<Navigate to="/login" replace />}
+            element={
+              <Navigate
+                to="/login"
+                replace
+              />
+            }
           />
 
           <Route
@@ -31,6 +42,50 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminRoute>
+                  <AdminPage />
+                </AdminRoute>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/students"
+            element={
+              <ProtectedRoute>
+                <AdminRoute>
+                  <AdminStudentsPage />
+                </AdminRoute>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/students/new"
+            element={
+              <ProtectedRoute>
+                <AdminRoute>
+                  <AdminStudentNewPage />
+                </AdminRoute>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/students/:id"
+            element={
+              <ProtectedRoute>
+                <AdminRoute>
+                  <AdminStudentDetailPage />
+                </AdminRoute>
               </ProtectedRoute>
             }
           />
