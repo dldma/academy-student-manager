@@ -17,6 +17,8 @@ import AdminStudentsPage from './pages/AdminStudentsPage'
 import AdminStudentNewPage from './pages/AdminStudentNewPage'
 import AdminStudentDetailPage from './pages/AdminStudentDetailPage'
 
+import StudentDetailPage from './pages/StudentDetailPage'
+
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +31,15 @@ function App() {
                 to="/login"
                 replace
               />
+            }
+          />
+
+          <Route
+            path="/students/:id"
+            element={
+              <ProtectedRoute>
+                <StudentDetailPage />
+              </ProtectedRoute>
             }
           />
 

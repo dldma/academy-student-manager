@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import LoadingState from '../components/LoadingState'
 import ErrorState from '../components/ErrorState'
 import EmptyState from '../components/EmptyState'
+import AppHeader from '../components/AppHeader'
 
 const weekdays = [
   { value: 0, label: '일요일' },
@@ -336,348 +337,262 @@ function AdminStudentDetailPage() {
   }
 
   return (
-    <div>
-      <h1>학생 상세 관리</h1>
+    <>
+      <AppHeader />
 
-      <section>
-        <h2>{student.name}</h2>
-
-        <p>
-          학교: {student.school}
-        </p>
-
-        <p>
-          학년: {student.grade}
-        </p>
-
-        <p>
-          상태:{' '}
-          <strong>
-            {student.status === 'active'
-              ? '재원'
-              : '퇴원'}
-          </strong>
-        </p>
-      </section>
-
-      <hr />
-
-      <section>
-        <h2>학생 정보 수정</h2>
-
-        <form onSubmit={handleUpdateStudent}>
+      <main className="page-container admin-page">
+        <div className="admin-page-heading">
           <div>
-            <label htmlFor="name">
-              학생 이름
-            </label>
-
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(event) =>
-                setName(event.target.value)
-              }
-            />
+            <button
+              className="link-button back-button"
+              type="button"
+              onClick={() => navigate('/admin/students')}
+            >
+              ← 학생 관리
+            </button>
+            <h1>학생 상세 관리</h1>
+            <p className="muted">
+              학생 정보와 수업 일정, 재원 상태를 관리합니다.
+            </p>
           </div>
+        </div>
 
-          <br />
-
-          <div>
-            <label htmlFor="school">
-              학교
-            </label>
-
-            <input
-              id="school"
-              type="text"
-              value={school}
-              onChange={(event) =>
-                setSchool(event.target.value)
-              }
-            />
+        <section className="admin-profile-card">
+          <div className="admin-profile-avatar">
+            {student.name?.slice(0, 1) ?? '?'}
           </div>
-
-          <br />
-
-          <div>
-            <label htmlFor="grade">
-              학년
-            </label>
-
-            <input
-              id="grade"
-              type="text"
-              value={grade}
-              onChange={(event) =>
-                setGrade(event.target.value)
-              }
-            />
+          <div className="admin-profile-info">
+            <div className="admin-profile-name-row">
+              <h2>{student.name}</h2>
+              <span
+                className={`status-badge ${
+                  student.status === 'active'
+                    ? 'status-badge-active'
+                    : 'status-badge-inactive'
+                }`}
+              >
+                {student.status === 'active' ? '재원' : '퇴원'}
+              </span>
+            </div>
+            <p>
+              {student.school} · {student.grade}
+            </p>
           </div>
+        </section>
 
-          <br />
-
-          <div>
-            <label htmlFor="studentPhone">
-              학생 전화번호
-            </label>
-
-            <input
-              id="studentPhone"
-              type="tel"
-              value={studentPhone}
-              onChange={(event) =>
-                setStudentPhone(event.target.value)
-              }
-            />
-          </div>
-
-          <br />
-
-          <div>
-            <label htmlFor="parentPhone">
-              학부모 전화번호
-            </label>
-
-            <input
-              id="parentPhone"
-              type="tel"
-              value={parentPhone}
-              onChange={(event) =>
-                setParentPhone(event.target.value)
-              }
-            />
-          </div>
-
-          <br />
-
-          <button
-            type="submit"
-            disabled={isSaving}
+        {(errorMessage || successMessage) && (
+          <div
+            className={`form-message ${
+              errorMessage
+                ? 'form-message-error'
+                : 'form-message-success'
+            }`}
           >
-            {isSaving
-              ? '저장 중...'
-              : '학생 정보 저장'}
-          </button>
-        </form>
-      </section>
-
-      <hr />
-
-      <section>
-        <h2>수업 일정</h2>
-
-        {schedules.length === 0 ? (
-          <EmptyState message="등록된 수업시간이 없습니다." />
-        ) : (
-          <div>
-            {schedules.map((schedule) => (
-              <div key={schedule.id}>
-                <strong>
-                  {getWeekdayName(schedule.weekday)}
-                </strong>
-
-                {' '}
-
-                {formatTime(schedule.start_time)}
-                {' - '}
-                {formatTime(schedule.end_time)}
-
-                {' / 담당: '}
-
-                {getTeacherName(
-                  schedule.teacher_id,
-                )}
-
-                {schedule.valid_to && (
-                  <span>
-                    {' '}
-                    / 종료됨
-                  </span>
-                )}
-              </div>
-            ))}
+            {errorMessage || successMessage}
           </div>
         )}
-      </section>
 
-      {student.status === 'active' && (
-        <>
-          <hr />
+        <div className="admin-detail-grid">
+          <section className="card">
+            <h2 className="section-title">학생 정보 수정</h2>
 
-          <section>
-            <h2>수업시간 추가</h2>
-
-            <form onSubmit={handleAddSchedule}>
-              <div>
-                <label htmlFor="teacher">
-                  담당 선생님
+            <form onSubmit={handleUpdateStudent}>
+              <div className="admin-form-grid">
+                <label className="admin-field">
+                  <span>학생 이름</span>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                  />
                 </label>
 
-                <select
-                  id="teacher"
-                  value={teacherId}
-                  onChange={(event) =>
-                    setTeacherId(
-                      event.target.value,
-                    )
-                  }
-                >
-                  <option value="">
-                    선생님 선택
-                  </option>
-
-                  {teachers.map((teacher) => (
-                    <option
-                      key={teacher.id}
-                      value={teacher.id}
-                    >
-                      {teacher.full_name}
-                      {teacher.role === 'admin'
-                        ? ' (원장)'
-                        : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <br />
-
-              <div>
-                <label htmlFor="weekday">
-                  요일
+                <label className="admin-field">
+                  <span>학교</span>
+                  <input
+                    type="text"
+                    value={school}
+                    onChange={(event) => setSchool(event.target.value)}
+                  />
                 </label>
 
-                <select
-                  id="weekday"
-                  value={weekday}
-                  onChange={(event) =>
-                    setWeekday(
-                      event.target.value,
-                    )
-                  }
-                >
-                  {weekdays.map((day) => (
-                    <option
-                      key={day.value}
-                      value={day.value}
-                    >
-                      {day.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <br />
-
-              <div>
-                <label htmlFor="startTime">
-                  시작시간
+                <label className="admin-field">
+                  <span>학년</span>
+                  <input
+                    type="text"
+                    value={grade}
+                    onChange={(event) => setGrade(event.target.value)}
+                  />
                 </label>
 
-                <input
-                  id="startTime"
-                  type="time"
-                  value={startTime}
-                  onChange={(event) =>
-                    setStartTime(
-                      event.target.value,
-                    )
-                  }
-                />
-              </div>
-
-              <br />
-
-              <div>
-                <label htmlFor="endTime">
-                  종료시간
+                <label className="admin-field">
+                  <span>학생 전화번호</span>
+                  <input
+                    type="tel"
+                    value={studentPhone}
+                    onChange={(event) =>
+                      setStudentPhone(event.target.value)
+                    }
+                  />
                 </label>
 
-                <input
-                  id="endTime"
-                  type="time"
-                  value={endTime}
-                  onChange={(event) =>
-                    setEndTime(
-                      event.target.value,
-                    )
-                  }
-                />
+                <label className="admin-field admin-field-full">
+                  <span>학부모 전화번호</span>
+                  <input
+                    type="tel"
+                    value={parentPhone}
+                    onChange={(event) =>
+                      setParentPhone(event.target.value)
+                    }
+                  />
+                </label>
               </div>
 
-              <br />
-
-              <button
-                type="submit"
-                disabled={isScheduleSubmitting}
-              >
-                {isScheduleSubmitting
-                  ? '등록 중...'
-                  : '수업시간 추가'}
-              </button>
+              <div className="admin-form-actions">
+                <button type="submit" disabled={isSaving}>
+                  {isSaving ? '저장 중...' : '학생 정보 저장'}
+                </button>
+              </div>
             </form>
           </section>
-        </>
-      )}
 
-      <hr />
+          <section className="card">
+            <h2 className="section-title">수업 일정</h2>
 
-      <section>
-        <h2>재원 상태 관리</h2>
+            {schedules.length === 0 ? (
+              <EmptyState message="등록된 수업시간이 없습니다." />
+            ) : (
+              <div className="admin-schedule-list">
+                {schedules.map((schedule) => (
+                  <div className="admin-schedule-row" key={schedule.id}>
+                    <strong>{getWeekdayName(schedule.weekday)}</strong>
+                    <span>
+                      {formatTime(schedule.start_time)} -{' '}
+                      {formatTime(schedule.end_time)}
+                    </span>
+                    <span className="muted">
+                      담당 {getTeacherName(schedule.teacher_id)}
+                    </span>
+                    {schedule.valid_to && (
+                      <span className="status-badge status-badge-inactive">
+                        종료됨
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
 
-        {student.status === 'active' ? (
-          <button
-            type="button"
-            disabled={isStatusChanging}
-            onClick={handleWithdraw}
-          >
-            {isStatusChanging
-              ? '처리 중...'
-              : '퇴원 처리'}
-          </button>
-        ) : (
-          <button
-            type="button"
-            disabled={isStatusChanging}
-            onClick={handleReenroll}
-          >
-            {isStatusChanging
-              ? '처리 중...'
-              : '재등록'}
-          </button>
+        {student.status === 'active' && (
+          <section className="card admin-section-gap">
+            <h2 className="section-title">수업시간 추가</h2>
+
+            <form onSubmit={handleAddSchedule}>
+              <div className="admin-form-grid admin-schedule-form-grid">
+                <label className="admin-field">
+                  <span>담당 선생님</span>
+                  <select
+                    value={teacherId}
+                    onChange={(event) => setTeacherId(event.target.value)}
+                  >
+                    <option value="">선생님 선택</option>
+                    {teachers.map((teacher) => (
+                      <option key={teacher.id} value={teacher.id}>
+                        {teacher.full_name}
+                        {teacher.role === 'admin' ? ' (원장)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="admin-field">
+                  <span>요일</span>
+                  <select
+                    value={weekday}
+                    onChange={(event) => setWeekday(event.target.value)}
+                  >
+                    {weekdays.map((day) => (
+                      <option key={day.value} value={day.value}>
+                        {day.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="admin-field">
+                  <span>시작시간</span>
+                  <input
+                    type="time"
+                    value={startTime}
+                    onChange={(event) => setStartTime(event.target.value)}
+                  />
+                </label>
+
+                <label className="admin-field">
+                  <span>종료시간</span>
+                  <input
+                    type="time"
+                    value={endTime}
+                    onChange={(event) => setEndTime(event.target.value)}
+                  />
+                </label>
+              </div>
+
+              <div className="admin-form-actions">
+                <button type="submit" disabled={isScheduleSubmitting}>
+                  {isScheduleSubmitting ? '등록 중...' : '수업시간 추가'}
+                </button>
+              </div>
+            </form>
+          </section>
         )}
-      </section>
 
-      {errorMessage && (
-        <p style={{ color: 'red' }}>
-          {errorMessage}
-        </p>
-      )}
+        <section className="card admin-section-gap">
+          <div className="admin-status-section">
+            <div>
+              <h2 className="section-title">재원 상태 관리</h2>
+              <p className="muted">
+                퇴원 처리해도 기존 학생 기록은 삭제되지 않습니다.
+              </p>
+            </div>
 
-      {successMessage && (
-        <p>
-          {successMessage}
-        </p>
-      )}
+            {student.status === 'active' ? (
+              <button
+                className="danger-button"
+                type="button"
+                disabled={isStatusChanging}
+                onClick={handleWithdraw}
+              >
+                {isStatusChanging ? '처리 중...' : '퇴원 처리'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={isStatusChanging}
+                onClick={handleReenroll}
+              >
+                {isStatusChanging ? '처리 중...' : '재등록'}
+              </button>
+            )}
+          </div>
+        </section>
 
-      <hr />
-
-      <button
-        type="button"
-        onClick={() =>
-          navigate('/admin/students')
-        }
-      >
-        학생 관리로 돌아가기
-      </button>
-
-      {' '}
-
-      <Link to="/admin">
-        원장 관리
-      </Link>
-    </div>
+        <div className="admin-bottom-nav">
+          <button
+            className="secondary-button"
+            type="button"
+            onClick={() => navigate('/admin/students')}
+          >
+            학생 관리로 돌아가기
+          </button>
+          <Link className="secondary-link-button" to="/admin">
+            원장 관리 홈
+          </Link>
+        </div>
+      </main>
+    </>
   )
 }
 

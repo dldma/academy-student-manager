@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { supabase } from '../lib/supabase'
+import AppHeader from '../components/AppHeader'
 
 function AdminStudentNewPage() {
   const navigate = useNavigate()
@@ -60,120 +61,98 @@ function AdminStudentNewPage() {
   }
 
   return (
-    <div>
-      <h1>학생 등록</h1>
+    <>
+      <AppHeader />
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">
-            학생 이름 *
-          </label>
-
-          <input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(event) =>
-              setName(event.target.value)
-            }
-          />
+      <main className="page-container admin-page admin-form-page">
+        <div className="admin-page-heading">
+          <div>
+            <Link className="back-link" to="/admin/students">
+              ← 학생 관리
+            </Link>
+            <h1>학생 등록</h1>
+            <p className="muted">
+              기본 정보와 연락처를 입력해 새 학생을 등록합니다.
+            </p>
+          </div>
         </div>
 
-        <br />
+        <section className="card admin-form-card">
+          <form onSubmit={handleSubmit}>
+            <div className="admin-form-grid">
+              <label className="admin-field">
+                <span>학생 이름 *</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder="학생 이름"
+                />
+              </label>
 
-        <div>
-          <label htmlFor="school">
-            학교 *
-          </label>
+              <label className="admin-field">
+                <span>학교 *</span>
+                <input
+                  type="text"
+                  value={school}
+                  onChange={(event) => setSchool(event.target.value)}
+                  placeholder="예: 관양중학교"
+                />
+              </label>
 
-          <input
-            id="school"
-            type="text"
-            value={school}
-            onChange={(event) =>
-              setSchool(event.target.value)
-            }
-          />
-        </div>
+              <label className="admin-field">
+                <span>학년 *</span>
+                <input
+                  type="text"
+                  value={grade}
+                  onChange={(event) => setGrade(event.target.value)}
+                  placeholder="예: 중3"
+                />
+              </label>
 
-        <br />
+              <label className="admin-field">
+                <span>학생 전화번호</span>
+                <input
+                  type="tel"
+                  value={studentPhone}
+                  onChange={(event) =>
+                    setStudentPhone(event.target.value)
+                  }
+                  placeholder="010-0000-0000"
+                />
+              </label>
 
-        <div>
-          <label htmlFor="grade">
-            학년 *
-          </label>
+              <label className="admin-field admin-field-full">
+                <span>학부모 전화번호</span>
+                <input
+                  type="tel"
+                  value={parentPhone}
+                  onChange={(event) =>
+                    setParentPhone(event.target.value)
+                  }
+                  placeholder="010-0000-0000"
+                />
+              </label>
+            </div>
 
-          <input
-            id="grade"
-            type="text"
-            placeholder="예: 중3"
-            value={grade}
-            onChange={(event) =>
-              setGrade(event.target.value)
-            }
-          />
-        </div>
+            {errorMessage && (
+              <div className="form-message form-message-error">
+                {errorMessage}
+              </div>
+            )}
 
-        <br />
-
-        <div>
-          <label htmlFor="studentPhone">
-            학생 전화번호
-          </label>
-
-          <input
-            id="studentPhone"
-            type="tel"
-            placeholder="010-0000-0000"
-            value={studentPhone}
-            onChange={(event) =>
-              setStudentPhone(event.target.value)
-            }
-          />
-        </div>
-
-        <br />
-
-        <div>
-          <label htmlFor="parentPhone">
-            학부모 전화번호
-          </label>
-
-          <input
-            id="parentPhone"
-            type="tel"
-            placeholder="010-0000-0000"
-            value={parentPhone}
-            onChange={(event) =>
-              setParentPhone(event.target.value)
-            }
-          />
-        </div>
-
-        {errorMessage && (
-          <p style={{ color: 'red' }}>
-            {errorMessage}
-          </p>
-        )}
-
-        <br />
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting
-            ? '등록 중...'
-            : '학생 등록'}
-        </button>
-      </form>
-
-      <br />
-
-      <Link to="/admin/students">
-        학생 관리로 돌아가기
-      </Link>
-    </div>
+            <div className="admin-form-actions">
+              <Link className="secondary-link-button" to="/admin/students">
+                취소
+              </Link>
+              <button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? '등록 중...' : '학생 등록'}
+              </button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </>
   )
 }
 
